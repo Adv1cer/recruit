@@ -10,13 +10,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={myFont.className}>
-        <div>
+        <div className="bg-slate-800">
           <Navbar />
         </div>
         <div>
           {children}
         </div>
-        <div>
+        <div className="bg-slate-800">
           <Footer />
         </div>
       </body>
