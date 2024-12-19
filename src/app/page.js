@@ -1,101 +1,371 @@
-import Image from "next/image";
+"use client";
+import React, { useEffect, useState } from "react";
+import Image from 'next/image';
+import { DateRangePicker } from "@nextui-org/date-picker";
+import { parseDate, getLocalTimeZone } from "@internationalized/date";
+import { useDateFormatter } from "@react-aria/i18n";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [subdistricts, setSubdistricts] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [provinces, setProvinces] = useState([]);
+  const [positions, setPositions] = useState([]);
+  const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const [filteredDistricts, setFilteredDistricts] = useState([]);
+  const [filteredSubdistricts, setFilteredSubdistricts] = useState([]);
+
+  const [selectedProvince, setSelectedProvince] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [selectedZipCode, setSelectedZipCode] = useState(""); // State for ZIP Code
+
+  const [error, setError] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch("/api/location");
+      const data = await response.json();
+      if (response.ok) {
+        setSubdistricts(data.subdistricts || []);
+        setDistricts(data.districts || []);
+        setProvinces(data.provinces || []);
+      } else {
+        setError(data.error || "Failed to fetch data");
+      }
+    } catch (error) {
+      setError("Error fetching data");
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const fetchPositions = async () => {
+    try {
+      const response = await fetch("/api/position");
+      const data = await response.json();
+      if (response.ok) {
+        setPositions(data || []);
+      } else {
+        setError(data.error || "Failed to fetch positions");
+      }
+    } catch (error) {
+      setError("Error fetching positions");
+      console.error("Error fetching positions:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    fetchPositions();
+  }, []);
+
+  // Filter districts when province is selected
+  useEffect(() => {
+    if (selectedProvince) {
+      setFilteredDistricts(
+        districts.filter((d) => d.province_id === selectedProvince)
+      );
+      setSelectedDistrict(null);
+      setFilteredSubdistricts([]);
+      setSelectedZipCode("");
+    } else {
+      setFilteredDistricts([]);
+    }
+  }, [selectedProvince, districts]);
+
+  // Filter subdistricts when district is selected
+  useEffect(() => {
+    if (selectedDistrict) {
+      setFilteredSubdistricts(
+        subdistricts.filter((s) => s.district_id === selectedDistrict)
+      );
+      setSelectedZipCode("");
+    } else {
+      setFilteredSubdistricts([]);
+    }
+  }, [selectedDistrict, subdistricts]);
+
+  const handleSubdistrictChange = (e) => {
+    const subdistrictId = parseInt(e.target.value);
+    const selectedSubdistrict = subdistricts.find(
+      (s) => s.id === subdistrictId
+    );
+    setSelectedZipCode(selectedSubdistrict?.zip_code || ""); // Set ZIP code
+  };
+
+
+
+  const handleDateChange = (range) => {
+    const startDate = range?.start ?? null;
+    const endDate = range?.end ?? null;
+
+    setDateRange({ startDate, endDate });
+
+    console.log("Start Date:", startDate);
+    console.log("End Date:", endDate);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Extract form data
+    const formData = new FormData(e.target);
+
+    // Validate dateRange before proceeding
+    if (!dateRange?.startDate || !dateRange?.endDate) {
+      alert("Please select a valid date range before submitting.");
+      return;
+    }
+
+    // Construct the data payload
+    const data = {
+      name: formData.get("name") || "",
+      date: formData.get("date") || "",
+      salary: formData.get("salary") || "",
+      citizen_id: formData.get("citizen_id") || "",
+      position: formData.get("position") || "",
+      address_1: formData.get("address_1") || "",
+      address_2: formData.get("address_2") || "",
+      province_id: selectedProvince || null,
+      district_id: selectedDistrict || null,
+      subdistrict_id: parseInt(formData.get("subdistrict")) || null,
+      zip_code: selectedZipCode || "",
+      start_date: dateRange.startDate.toDate(getLocalTimeZone()).toISOString().split("T")[0], // Format as YYYY-MM-DD
+      end_date: dateRange.endDate.toDate(getLocalTimeZone()).toISOString().split("T")[0],     // Format as YYYY-MM-DD
+    };
+
+    console.log("Submitting Form Data:", data);
+
+    try {
+      const response = await fetch("/api/formsubmit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert("Data submitted successfully!");
+        console.log("Server response:", result);
+        // Optionally reset the form or state here
+        e.target.reset();
+      } else {
+        setError(result.error || "Failed to submit data.");
+        console.error("Error response from server:", result.error);
+      }
+    } catch (error) {
+      setError("An error occurred while submitting the data.");
+      console.error("Submission error:", error);
+    }
+  };
+
+  return (
+    <div className="bg-slate-100">
+      <div className="relative">
+        <div className="h-64 w-full flex flex-col items-center justify-center bg-cover bg-center relative">
+          <Image
+            src="/bg.png"
+            alt="bg"
+            layout="fill"
+            objectFit="cover"
+            className=""
+          />
+          <div className="relative inline-block">
+            <div className="absolute inset-0 bg-white opacity-80 rounded-md"></div>
+            <h1 className="relative text-black p-8 text-4xl font-bold z-10 underline hover:scale-110 transition-transform duration-300 rounded-md">
+              START YOUR CAREER WITH US
+            </h1>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      <div className="text-center bg-orange-500 py-4 text-white">
+        <h2>Form Application for Employment</h2>
+        <h3>Please enter the information according to the fields</h3>
+      </div>
+
+      <div className="max-w-5xl mx-auto mt-10 p-6 bg-white shadow-md rounded-md">
+        <h2 className="text-center text-2xl font-bold mb-6">Job Application Form</h2>
+        <form onSubmit={handleSubmit}>
+          <h3 className="text-xl font-semibold mb-4">Personal Information</h3>
+          {/* Form Row */}
+          <div className="grid grid-cols-1 gap-y-6 gap-x-4">
+            {/* Name-Surname */}
+            <div className="flex items-center">
+              <label className="w-1/3 text-gray-700 font-semibold">Name-Surname:</label>
+              <input
+                type="text"
+                name="name"
+                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                required
+              />
+            </div>
+
+            {/* Citizen ID */}
+            <div className="flex items-center">
+              <label className="w-1/3 text-gray-700 font-semibold">Citizen ID:</label>
+              <input
+                type="text"
+                name="citizen_id"
+                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                required
+              />
+            </div>
+
+            {/* Document Date */}
+            <div className="flex items-center">
+              <label className="w-1/3 text-gray-700 font-semibold">Document Date:</label>
+              <input
+                type="date"
+                name="date"
+                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                required
+              />
+            </div>
+
+            {/* Date Range Picker */}
+            <div className="flex items-center">
+              <label className="w-1/3 text-gray-700 font-semibold">Stay Duration:</label>
+              <DateRangePicker
+                className="max-w-xs"
+                label="Stay duration"
+                onChange={handleDateChange}
+                value={dateRange}
+              />
+            </div>
+
+            {/* Position */}
+            <div className="flex items-center">
+              <label className="w-1/3 text-gray-700 font-semibold">Position:</label>
+              <select
+                name="position"
+                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                required
+              >
+                <option value="">Select Position</option>
+                {positions.map((item) => (
+                  <option key={item.position_id} value={item.position_id}>
+                    {item.position_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Salary */}
+            <div className="flex items-center">
+              <label className="w-1/3 text-gray-700 font-semibold">Salary:</label>
+              <input
+                type="number"
+                name="salary"
+                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                required
+              />
+            </div>
+
+            <h3 className="text-xl font-semibold mt-10">
+              Address
+            </h3>
+            {/* Address 1 */}
+            <div className="flex items-center">
+              <label className="w-1/3 text-gray-700 font-semibold">Address 1:</label>
+              <input
+                type="text"
+                name="address_1"
+                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                required
+                placeholder="Enter address 1"
+              />
+            </div>
+
+            {/* Address 2 */}
+            <div className="flex items-center">
+              <label className="w-1/3 text-gray-700 font-semibold">Address 2:</label>
+              <input
+                type="text"
+                name="address_2"
+                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                required
+                placeholder="Enter address 2"
+              />
+            </div>
+            {/* Province Dropdown */}
+            <div className="flex items-center">
+              <label className="w-1/3 text-gray-700 font-semibold">Province:</label>
+              <select
+                name="province"
+                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                onChange={(e) => setSelectedProvince(parseInt(e.target.value))}
+                required
+              >
+                <option value="">Select Province</option>
+                {provinces.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name_in_thai}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* District Dropdown */}
+            <div className="flex items-center">
+              <label className="w-1/3 text-gray-700 font-semibold">District:</label>
+              <select
+                name="district"
+                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                onChange={(e) => setSelectedDistrict(parseInt(e.target.value))}
+                disabled={!filteredDistricts.length}
+                required
+              >
+                <option value="">Select District</option>
+                {filteredDistricts.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name_in_thai}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Subdistrict Dropdown */}
+            <div className="flex items-center">
+              <label className="w-1/3 text-gray-700 font-semibold">Subdistrict:</label>
+              <select
+                name="subdistrict"
+                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                onChange={handleSubdistrictChange}
+                disabled={!filteredSubdistricts.length}
+                required
+              >
+                <option value="">Select Subdistrict</option>
+                {filteredSubdistricts.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name_in_thai}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Zip Code */}
+            {selectedZipCode && (
+              <div className="flex items-center">
+                <label className="w-1/3 text-gray-700 font-semibold">Zip Code:</label>
+                <p className="w-2/3 text-gray-700">{selectedZipCode}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <div className="text-right mt-6">
+            <button
+              type="submit"
+              className="px-4 py-2 bg-orange-500 text-white font-bold rounded hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
