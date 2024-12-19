@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import "../globals.css";
 
 export default function Dashboard() {
   const [applications, setApplications] = useState([]);

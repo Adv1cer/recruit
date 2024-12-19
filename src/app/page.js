@@ -4,6 +4,20 @@ import Image from 'next/image';
 import { DateRangePicker } from "@nextui-org/date-picker";
 import { parseDate, getLocalTimeZone } from "@internationalized/date";
 import { useDateFormatter } from "@react-aria/i18n";
+// Import Swiper React components
+import { Swiper, SwiperSlide } from 'swiper/react';
+import localFont from "next/font/local";
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+
+import "./globals.css";
+
+// import required modules
+import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+const Aspekta800 = localFont({ src: './fonts/Aspekta-800.woff2' })
 
 export default function Home() {
   const [subdistricts, setSubdistricts] = useState([]);
@@ -162,34 +176,68 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-slate-100">
-      <div className="relative">
-        <div className="h-64 w-full flex flex-col items-center justify-center bg-cover bg-center relative">
-          <Image
-            src="/bg.png"
-            alt="bg"
-            layout="fill"
-            objectFit="cover"
-            className=""
-          />
-          <div className="relative inline-block">
-            <div className="absolute inset-0 bg-white opacity-80 rounded-md"></div>
-            <h1 className="relative text-black p-8 text-4xl font-bold z-10 underline hover:scale-110 transition-transform duration-300 rounded-md">
-              START YOUR CAREER WITH US
-            </h1>
+    <div className="bg-slate-100 pb-10">
+      <div className="block-section">
+        <div className="relative">
+          <div className="h-64 w-full flex flex-col items-center justify-center bg-cover bg-center relative">
+            <Swiper
+              spaceBetween={30}
+              centeredSlides={true}
+              autoplay={{
+                delay: 2500,
+                disableOnInteraction: false,
+              }}
+              navigation={true}
+              modules={[Autoplay, Pagination]}
+              className="mySwiper"
+            >
+              <SwiperSlide>
+                <Image
+                  src="/img-asset-1.jpg"
+                  alt="img-asset-1"
+                  fill
+                  style={{ objectFit: "cover" }}
+                  className=""
+                />
+              </SwiperSlide>
+              <SwiperSlide>
+                <Image
+                  src="/img-asset-2.jpg"
+                  alt="img-asset-2"
+                  fill
+                  style={{ objectFit: "cover" }}
+                  className=""
+                />
+              </SwiperSlide>
+              <SwiperSlide>
+                <Image
+                  src="/img-asset-3.jpg"
+                  alt="img-asset-3.jpg"
+                  fill
+                  style={{ objectFit: "cover" }}
+                  className=""
+                />
+              </SwiperSlide>
+            </Swiper>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 bg-white opacity-80 rounded-md"></div>
+              <h1 className="relative text-white p-8 text-4xl font-bold z-10 underline hover:scale-110 transition-transform duration-300 rounded-md">
+                START YOUR CAREER WITH US
+              </h1>
+            </div>
           </div>
+        </div>
+
+        <div className="text-center bg-orange-500 py-4 text-white">
+          <h2>Form Application for Employment</h2>
+          <h3>Please enter the information according to the fields</h3>
         </div>
       </div>
 
-      <div className="text-center bg-orange-500 py-4 text-white">
-        <h2>Form Application for Employment</h2>
-        <h3>Please enter the information according to the fields</h3>
-      </div>
-
-      <div className="max-w-5xl mx-auto mt-10 p-6 bg-white shadow-md rounded-md">
-        <h2 className="text-center text-2xl font-bold mb-6">Job Application Form</h2>
+      <div className=" max-w-5xl mx-auto mt-10 p-6 bg-white shadow-md rounded-md">
+        <h2 className="text-center text-2xl font-bold mb-6 text-grey-700">Job Application Form</h2>
         <form onSubmit={handleSubmit}>
-          <h3 className="text-xl font-semibold mb-4">Personal Information</h3>
+          <h3 className="text-xl font-semibold mb-4 text-gray-700">Personal Information</h3>
           {/* Form Row */}
           <div className="grid grid-cols-1 gap-y-6 gap-x-4">
             {/* Name-Surname */}
@@ -200,6 +248,7 @@ export default function Home() {
                 name="name"
                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 required
+                placeholder="Enter name-surname"
               />
             </div>
 
@@ -211,6 +260,7 @@ export default function Home() {
                 name="citizen_id"
                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 required
+                placeholder="Enter citizen ID"
               />
             </div>
 
@@ -227,10 +277,10 @@ export default function Home() {
 
             {/* Date Range Picker */}
             <div className="flex items-center">
-              <label className="w-1/3 text-gray-700 font-semibold">Stay Duration:</label>
+              <label className="w-1/3 text-gray-700 font-semibold">Contract Duration:</label>
               <DateRangePicker
                 className="max-w-xs"
-                label="Stay duration"
+                label="Contract duration"
                 onChange={handleDateChange}
                 value={dateRange}
               />
@@ -261,10 +311,11 @@ export default function Home() {
                 name="salary"
                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 required
+                placeholder="Enter expected salary"
               />
             </div>
 
-            <h3 className="text-xl font-semibold mt-10">
+            <h3 className="text-xl font-semibold mt-10 text-gray-700">
               Address
             </h3>
             {/* Address 1 */}

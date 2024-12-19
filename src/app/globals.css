@@ -14,14 +14,152 @@
   }
 }
 
+
+
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
+
+
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: #fff;
+
+  /* Center slide text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.navbar {
+  background: linear-gradient(to bottom, #26263e, #282840);
+  padding: 1rem 2rem;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #f5f5f5 !important;
+}
+
+.nav-link {
+  color: #f5f5f5 !important;
+  transition: color 0.3s ease-in-out;
+}
+
+.nav-link:hover {
+  color: #f5a623 !important;
+}
+
+.navbar-toggler {
+  border-color: #f5f5f5;
+}
+
+.navbar-toggler-icon {
+  background-color: #f5f5f5;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes disappear {
+  from {
+    opacity: 1;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+
+.block-section {
+  animation: appear 1s linear forwards, disappear 1s linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 60%, exit 60% cover 100%;
+}
+
+
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    width: 120px;
+    height: 120px;
+    -webkit-animation: spin 2s linear infinite; 
+    animation: spin 2s linear infinite;
+  }
+  
+  /* Safari */
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  .slide-down-enter {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out;
+  }
+  
+  .slide-down-enter-active {
+    max-height: 1000px; /* Adjust this value based on your content */
+  }
+  
+  .slide-down-leave {
+    max-height: 1000px; /* Adjust this value based on your content */
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out;
+  }
+  
+  .slide-down-leave-active {
+    max-height: 0;
   }
 }

@@ -10,11 +10,13 @@ export async function GET(request) {
     });
 
     const query = `
-      SELECT a.application_id, a.name, a.date, a.start_date, a.end_date, a.salary, a.citizen_id, a.position, a.address_1, a.address_2, p.name_in_thai AS province, d.name_in_thai AS district, s.name_in_thai AS subdistrict, a.zip_code
+      SELECT a.application_id, a.name, a.date, a.start_date, a.end_date, a.salary, a.citizen_id, po.position_name AS position, a.address_1, a.address_2, p.name_in_thai AS province, d.name_in_thai AS district, s.name_in_thai AS subdistrict, a.zip_code
       FROM application a
+      JOIN position po ON a.position = po.position_id
       JOIN provinces p ON a.province = p.id
       JOIN districts d ON a.district = d.id
       JOIN subdistricts s ON a.subdistrict = s.id
+      ORDER BY a.application_id DESC
     `;
     const [rows] = await connection.execute(query);
     await connection.end();
