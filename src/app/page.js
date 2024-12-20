@@ -112,9 +112,11 @@ export default function Home() {
 
 
     const handleDateChange = (range) => {
+        const today = new Date();
+        const currentDate = parseDate(today.toISOString().split("T")[0]);
         setDateRange({
-            start: range.start ? parseDate(range.start.toString()) : currentDate,
-            end: range.end ? parseDate(range.end.toString()) : currentDate,
+            start: range?.start ? parseDate(range.start.toString()) : currentDate,
+            end: range?.end ? parseDate(range.end.toString()) : currentDate,
         });
     };
 
@@ -235,7 +237,7 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className=" max-w-5xl mx-auto mt-10 p-6 text-gray-700 shadow-md rounded-md">
+            <div className="bg-white max-w-4xl mx-auto mt-10 p-6 text-gray-700 shadow-md rounded-md">
                 <h2 className="text-center text-2xl font-bold mb-6 text-grey-700">Job Application Form</h2>
                 <form onSubmit={handleSubmit}>
                     <h3 className="text-xl font-semibold mb-4 text-gray-700">Personal Information</h3>
@@ -243,8 +245,9 @@ export default function Home() {
                     <div className="grid grid-cols-1 gap-y-6 gap-x-4">
                         {/* Name-Surname */}
                         <div className="flex items-center">
-                            <label className="w-1/3 text-gray-700 font-semibold">Name-Surname:</label>
+                            <label className="w-1/3 text-gray-700 font-semibold">Name-Surname :</label>
                             <input
+                                maxLength="40"
                                 type="text"
                                 name="name"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -255,11 +258,12 @@ export default function Home() {
 
                         {/* Citizen ID */}
                         <div className="flex items-center">
-                            <label className="w-1/3 text-gray-700 font-semibold">Citizen ID:</label>
+                            <label className="w-1/3 text-gray-700 font-semibold">Citizen ID :</label>
                             <input
+                                maxLength="13"
                                 type="text"
                                 name="citizen_id"
-                                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500 "
                                 required
                                 placeholder="Enter citizen ID"
                             />
@@ -267,7 +271,7 @@ export default function Home() {
 
                         {/* Document Date */}
                         <div className="flex items-center">
-                            <label className="w-1/3 text-gray-700 font-semibold">Document Date:</label>
+                            <label className="w-1/3 text-gray-700 font-semibold">Document Date :</label>
                             <input
                                 type="date"
                                 name="date"
@@ -278,24 +282,21 @@ export default function Home() {
 
                         {/* Date Range Picker */}
                         <div className="flex items-center">
-                            <label className="w-1/3 font-semibold">Contract Duration:</label>
+                            <label className="w-1/3 font-semibold">Contract Duration :</label>
                             <DateRangePicker
-  className="max-w-xs"
-  css={{
-    color: '#64748b', // Tailwind slate color equivalent
-    backgroundColor: 'var(--background)',
-  }}
-  label="Contract duration"
-  onChange={handleDateChange}
-  value={dateRange}
-/>
+                                className="max-w-xs"
+                                css={{
+                                    color: '#64748b', // Tailwind slate color equivalent
+                                    backgroundColor: 'var(--background)',
+                                }}
+                                label="Contract duration"
+                                onChange={handleDateChange}
+                                value={dateRange}
+                            />
                         </div>
-
-
-
                         {/* Position */}
                         <div className="flex items-center">
-                            <label className="w-1/3 text-gray-700 font-semibold">Position:</label>
+                            <label className="w-1/3 text-gray-700 font-semibold">Position :</label>
                             <select
                                 name="position"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -312,8 +313,9 @@ export default function Home() {
 
                         {/* Salary */}
                         <div className="flex items-center">
-                            <label className="w-1/3 text-gray-700 font-semibold">Salary:</label>
+                            <label className="w-1/3 text-gray-700 font-semibold">Salary :</label>
                             <input
+                                maxLength="7"
                                 type="number"
                                 name="salary"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -327,8 +329,9 @@ export default function Home() {
                         </h3>
                         {/* Address 1 */}
                         <div className="flex items-center">
-                            <label className="w-1/3 text-gray-700 font-semibold">Address 1:</label>
+                            <label className="w-1/3 text-gray-700 font-semibold">Address 1 :</label>
                             <input
+                                maxLength="50"
                                 type="text"
                                 name="address_1"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -339,18 +342,19 @@ export default function Home() {
 
                         {/* Address 2 */}
                         <div className="flex items-center">
-                            <label className="w-1/3 text-gray-700 font-semibold">Address 2:</label>
+                            <label className="w-1/3 text-gray-700 font-semibold">Address 2 (optional) :</label>
                             <input
+                                value="-"
+                                maxLength="50"
                                 type="text"
                                 name="address_2"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                required
-                                placeholder="Enter address 2"
+                                placeholder="Enter address 2 (Optional)"
                             />
                         </div>
                         {/* Province Dropdown */}
                         <div className="flex items-center">
-                            <label className="w-1/3 text-gray-700 font-semibold">Province:</label>
+                            <label className="w-1/3 text-gray-700 font-semibold">Province :</label>
                             <select
                                 name="province"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -368,7 +372,7 @@ export default function Home() {
 
                         {/* District Dropdown */}
                         <div className="flex items-center">
-                            <label className="w-1/3 text-gray-700 font-semibold">District:</label>
+                            <label className="w-1/3 text-gray-700 font-semibold">District :</label>
                             <select
                                 name="district"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -387,7 +391,7 @@ export default function Home() {
 
                         {/* Subdistrict Dropdown */}
                         <div className="flex items-center">
-                            <label className="w-1/3 text-gray-700 font-semibold">Subdistrict:</label>
+                            <label className="w-1/3 text-gray-700 font-semibold">Subdistrict :</label>
                             <select
                                 name="subdistrict"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -407,7 +411,7 @@ export default function Home() {
                         {/* Zip Code */}
                         {selectedZipCode && (
                             <div className="flex items-center">
-                                <label className="w-1/3 text-gray-700 font-semibold">Zip Code:</label>
+                                <label className="w-1/3 text-gray-700 font-semibold">Zip Code :</label>
                                 <p className="w-2/3 text-gray-700">{selectedZipCode}</p>
                             </div>
                         )}

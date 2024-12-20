@@ -72,6 +72,10 @@ body {
   padding: 1rem 2rem;
 }
 
+.nav-color{
+  background: linear-gradient(to bottom, #26263e, #282840);
+}
+
 .navbar-brand {
   font-size: 1.5rem;
   font-weight: bold;
@@ -178,5 +182,9 @@ body {
   
   .slide-down-leave-active {
     max-height: 0;
+  }
+
+  hr.solid {
+    border-top: 3px solid var(--bs-light-bg-subtle);
   }
 }

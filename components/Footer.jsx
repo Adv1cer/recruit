@@ -33,7 +33,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <footer className="py-3 bg-dark">
+      <footer className="py-3 bg-slate-800">
         <ul className="nav justify-content-center border-bottom pb-3 mb-3">
           <li className="nav-item"><a href="https://www.vannessplus.com/index.php" className="nav-link px-2 text-white">HOME</a></li>
           <li className="nav-item"><a href="https://www.vannessplus.com/index.php#about" className="nav-link px-2 text-white">ABOUT US</a></li>
