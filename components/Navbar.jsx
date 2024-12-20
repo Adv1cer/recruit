@@ -40,6 +40,16 @@ export default function Navbar() {
                 Career Tips
               </Link>
             </li>
+            <li className="nav-item">
+              <Link className="nav-link hover:scale-110 transition-transform duration-1000" href="/dashboard">
+                Dashboard
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link hover:scale-110 transition-transform duration-1000" href="/">
+                Form
+              </Link>
+            </li>
           </ul>
         </div>
       </nav>
