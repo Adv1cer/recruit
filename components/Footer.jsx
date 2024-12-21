@@ -18,11 +18,11 @@ export default function Footer() {
             <h3 className="mx-2">Silom, Bangrak, Bangkok 10500</h3>
           </div>
           <div className="mb-4 md:mb-0">
-            <h3 className="">email</h3>
+            <h3 className="">Email</h3>
             <h3 className="mx-2">hr@vannessplus.com</h3>
           </div>
           <div>
-            <h3 className="">phone</h3>
+            <h3 className="">Phone</h3>
             <h3 className="mx-2">084-922-3468</h3>
           </div>
         </div>
