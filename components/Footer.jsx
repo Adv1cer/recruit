@@ -1,5 +1,4 @@
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
-import GoogleMapRouteComponent from './Googlemap';
+
 import "../src/app/globals.css";
 
 export default function Footer() {
@@ -28,9 +27,17 @@ export default function Footer() {
           </div>
         </div>
         <div className="flex flex-wrap items-start justify-between bg-white rounded-md mx-4">
-          <div className="flex-1 w-full h-full m-4 max-w-[300px] p-10">
-            <GoogleMapRouteComponent />
-          </div>
+        <div className="flex-1 w-full h-full m-4 p-10">
+    <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3017.981855827901!2d100.5293478!3d13.7222904!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e299ed02c811c3%3A0x8b2963163abc52e7!2sVanness%20Plus%20Consulting%20Co.%2C%20Ltd.!5e1!3m2!1sth!2sth!4v1734770441327!5m2!1sth!2sth"
+        width="100%"
+        height="450"
+        style={{ border: 0 }}
+        allowFullScreen=""
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+    ></iframe>
+</div>
         </div>
       </div>
       <footer className="py-3 bg-slate-800">

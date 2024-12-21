@@ -3,8 +3,6 @@ import React, { useEffect, useState } from "react";
 import Image from 'next/image';
 import { DateRangePicker } from "@nextui-org/date-picker";
 import { parseDate, getLocalTimeZone } from "@internationalized/date";
-import { useDateFormatter } from "@react-aria/i18n";
-// Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
 import localFont from "next/font/local";
 
@@ -17,10 +15,9 @@ import "./globals.css";
 
 // import required modules
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
-const Aspekta800 = localFont({ src: './fonts/Aspekta-800.woff2' })
+const Aspekta800 = localFont({ src: './fonts/Aspekta-800.woff2' });
 
 export default function Home() {
-
     const today = new Date();
     const currentDate = parseDate(today.toISOString().split("T")[0]);
     const [subdistricts, setSubdistricts] = useState([]);
@@ -28,15 +25,13 @@ export default function Home() {
     const [provinces, setProvinces] = useState([]);
     const [positions, setPositions] = useState([]);
     const [dateRange, setDateRange] = useState({ startDate: currentDate, endDate: currentDate });
-
     const [filteredDistricts, setFilteredDistricts] = useState([]);
     const [filteredSubdistricts, setFilteredSubdistricts] = useState([]);
-
     const [selectedProvince, setSelectedProvince] = useState(null);
     const [selectedDistrict, setSelectedDistrict] = useState(null);
-    const [selectedZipCode, setSelectedZipCode] = useState(""); // State for ZIP Code
-
+    const [selectedZipCode, setSelectedZipCode] = useState("");
     const [error, setError] = useState(null);
+    const [formData, setFormData] = useState({ address_2: "-" });
 
     const fetchData = async () => {
         try {
@@ -75,12 +70,9 @@ export default function Home() {
         fetchPositions();
     }, []);
 
-    // Filter districts when province is selected
     useEffect(() => {
         if (selectedProvince) {
-            setFilteredDistricts(
-                districts.filter((d) => d.province_id === selectedProvince)
-            );
+            setFilteredDistricts(districts.filter((d) => d.province_id === selectedProvince));
             setSelectedDistrict(null);
             setFilteredSubdistricts([]);
             setSelectedZipCode("");
@@ -89,12 +81,9 @@ export default function Home() {
         }
     }, [selectedProvince, districts]);
 
-    // Filter subdistricts when district is selected
     useEffect(() => {
         if (selectedDistrict) {
-            setFilteredSubdistricts(
-                subdistricts.filter((s) => s.district_id === selectedDistrict)
-            );
+            setFilteredSubdistricts(subdistricts.filter((s) => s.district_id === selectedDistrict));
             setSelectedZipCode("");
         } else {
             setFilteredSubdistricts([]);
@@ -103,13 +92,17 @@ export default function Home() {
 
     const handleSubdistrictChange = (e) => {
         const subdistrictId = parseInt(e.target.value);
-        const selectedSubdistrict = subdistricts.find(
-            (s) => s.id === subdistrictId
-        );
-        setSelectedZipCode(selectedSubdistrict?.zip_code || ""); // Set ZIP code
+        const selectedSubdistrict = subdistricts.find((s) => s.id === subdistrictId);
+        setSelectedZipCode(selectedSubdistrict?.zip_code || "");
     };
 
-
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
+    };
 
     const handleDateChange = (range) => {
         const today = new Date();
@@ -123,33 +116,62 @@ export default function Home() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Extract form data
-        const formData = new FormData(e.target);
-
-        // Validate dateRange before proceeding
         if (!dateRange?.start || !dateRange?.end) {
             alert("Please select a valid date range before submitting.");
             return;
         }
 
-        // Construct the data payload
-        const data = {
-            name: formData.get("name") || "",
-            date: formData.get("date") || "",
-            salary: formData.get("salary") || "",
-            citizen_id: formData.get("citizen_id") || "",
-            position: formData.get("position") || "",
-            address_1: formData.get("address_1") || "",
-            address_2: formData.get("address_2") || "",
-            province_id: selectedProvince || null,
-            district_id: selectedDistrict || null,
-            subdistrict_id: parseInt(formData.get("subdistrict")) || null,
+        const confirmationData = {
+            name: formData.name || "",
+            date: formData.date || "",
+            salary: formData.salary || "",
+            citizen_id: formData.citizen_id || "",
+            position: positions.find(p => p.position_id === parseInt(formData.position))?.position_name || "",
+            address_1: formData.address_1 || "",
+            address_2: formData.address_2 || "",
+            province: provinces.find(p => p.id === selectedProvince)?.name_in_thai || "",
+            district: districts.find(d => d.id === selectedDistrict)?.name_in_thai || "",
+            subdistrict: subdistricts.find(s => s.id === parseInt(formData.subdistrict))?.name_in_thai || "",
             zip_code: selectedZipCode || "",
-            start_date: dateRange.start.toDate(getLocalTimeZone()).toISOString().split("T")[0], // Format as YYYY-MM-DD
-            end_date: dateRange.end.toDate(getLocalTimeZone()).toISOString().split("T")[0],     // Format as YYYY-MM-DD
+            start_date: dateRange.start.toDate(getLocalTimeZone()).toISOString().split("T")[0],
+            end_date: dateRange.end.toDate(getLocalTimeZone()).toISOString().split("T")[0],
         };
 
-        console.log("Submitting Form Data:", data);
+        const submissionData = {
+            name: formData.name || "",
+            date: formData.date || "",
+            salary: formData.salary || "",
+            citizen_id: formData.citizen_id || "",
+            position: formData.position || "",
+            address_1: formData.address_1 || "",
+            address_2: formData.address_2 || "",
+            province_id: selectedProvince || null,
+            district_id: selectedDistrict || null,
+            subdistrict_id: parseInt(formData.subdistrict) || null,
+            zip_code: selectedZipCode || "",
+            start_date: dateRange.start.toDate(getLocalTimeZone()).toISOString().split("T")[0],
+            end_date: dateRange.end.toDate(getLocalTimeZone()).toISOString().split("T")[0],
+        };
+
+        const confirmationMessage = `
+            Please confirm your details:
+            Name-Surname: ${confirmationData.name}
+            Citizen ID: ${confirmationData.citizen_id}
+            Document Date: ${confirmationData.date}
+            Contract Duration: ${confirmationData.start_date} to ${confirmationData.end_date}
+            Position: ${confirmationData.position}
+            Salary: ${confirmationData.salary}
+            Address 1: ${confirmationData.address_1}
+            Address 2: ${confirmationData.address_2}
+            Province: ${confirmationData.province}
+            District: ${confirmationData.district}
+            Subdistrict: ${confirmationData.subdistrict}
+            Zip Code: ${confirmationData.zip_code}
+        `;
+
+        if (!window.confirm(confirmationMessage)) {
+            return;
+        }
 
         try {
             const response = await fetch("/api/formsubmit", {
@@ -157,24 +179,19 @@ export default function Home() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(submissionData),
             });
 
             const result = await response.json();
 
             if (response.ok) {
                 alert("Data submitted successfully!");
-                console.log("Server response:", result);
-
                 e.target.reset();
-                // window.location.reload(); 
             } else {
-                setError(result.error || "Failed to submit data.");
-                console.error("Error response from server:", result.error);
+                setError(result.error || "An error occurred.");
             }
         } catch (error) {
             setError("An error occurred while submitting the data.");
-            console.error("Submission error:", error);
         }
     };
 
@@ -241,9 +258,7 @@ export default function Home() {
                 <h2 className="text-center text-2xl font-bold mb-6 text-grey-700">Job Application Form</h2>
                 <form onSubmit={handleSubmit}>
                     <h3 className="text-xl font-semibold mb-4 text-gray-700">Personal Information</h3>
-                    {/* Form Row */}
                     <div className="grid grid-cols-1 gap-y-6 gap-x-4">
-                        {/* Name-Surname */}
                         <div className="flex items-center">
                             <label className="w-1/3 text-gray-700 font-semibold">Name-Surname :</label>
                             <input
@@ -253,23 +268,21 @@ export default function Home() {
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 required
                                 placeholder="Enter name-surname"
+                                onChange={handleChange}
                             />
                         </div>
-
-                        {/* Citizen ID */}
                         <div className="flex items-center">
                             <label className="w-1/3 text-gray-700 font-semibold">Citizen ID :</label>
                             <input
                                 maxLength="13"
                                 type="text"
                                 name="citizen_id"
-                                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500 "
+                                className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 required
                                 placeholder="Enter citizen ID"
+                                onChange={handleChange}
                             />
                         </div>
-
-                        {/* Document Date */}
                         <div className="flex items-center">
                             <label className="w-1/3 text-gray-700 font-semibold">Document Date :</label>
                             <input
@@ -277,30 +290,25 @@ export default function Home() {
                                 name="date"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 required
+                                onChange={handleChange}
                             />
                         </div>
-
-                        {/* Date Range Picker */}
                         <div className="flex items-center">
                             <label className="w-1/3 font-semibold">Contract Duration :</label>
                             <DateRangePicker
-                                className="max-w-xs"
-                                css={{
-                                    color: '#64748b', // Tailwind slate color equivalent
-                                    backgroundColor: 'var(--background)',
-                                }}
+                                className="max-w-xs text-black"
                                 label="Contract duration"
                                 onChange={handleDateChange}
                                 value={dateRange}
                             />
                         </div>
-                        {/* Position */}
                         <div className="flex items-center">
                             <label className="w-1/3 text-gray-700 font-semibold">Position :</label>
                             <select
                                 name="position"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 required
+                                onChange={handleChange}
                             >
                                 <option value="">Select Position</option>
                                 {positions.map((item) => (
@@ -310,8 +318,6 @@ export default function Home() {
                                 ))}
                             </select>
                         </div>
-
-                        {/* Salary */}
                         <div className="flex items-center">
                             <label className="w-1/3 text-gray-700 font-semibold">Salary :</label>
                             <input
@@ -321,13 +327,10 @@ export default function Home() {
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 required
                                 placeholder="Enter expected salary"
+                                onChange={handleChange}
                             />
                         </div>
-
-                        <h3 className="text-xl font-semibold mt-10 text-gray-700">
-                            Address
-                        </h3>
-                        {/* Address 1 */}
+                        <h3 className="text-xl font-semibold mt-10 text-gray-700">Address</h3>
                         <div className="flex items-center">
                             <label className="w-1/3 text-gray-700 font-semibold">Address 1 :</label>
                             <input
@@ -337,28 +340,30 @@ export default function Home() {
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 required
                                 placeholder="Enter address 1"
+                                onChange={handleChange}
                             />
                         </div>
-
-                        {/* Address 2 */}
                         <div className="flex items-center">
                             <label className="w-1/3 text-gray-700 font-semibold">Address 2 (optional) :</label>
                             <input
-                                value="-"
                                 maxLength="50"
                                 type="text"
                                 name="address_2"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 placeholder="Enter address 2 (Optional)"
+                                onChange={handleChange}
+                                value={formData.address_2}
                             />
                         </div>
-                        {/* Province Dropdown */}
                         <div className="flex items-center">
                             <label className="w-1/3 text-gray-700 font-semibold">Province :</label>
                             <select
                                 name="province"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                onChange={(e) => setSelectedProvince(parseInt(e.target.value))}
+                                onChange={(e) => {
+                                    handleChange(e);
+                                    setSelectedProvince(parseInt(e.target.value));
+                                }}
                                 required
                             >
                                 <option value="">Select Province</option>
@@ -369,14 +374,15 @@ export default function Home() {
                                 ))}
                             </select>
                         </div>
-
-                        {/* District Dropdown */}
                         <div className="flex items-center">
                             <label className="w-1/3 text-gray-700 font-semibold">District :</label>
                             <select
                                 name="district"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                onChange={(e) => setSelectedDistrict(parseInt(e.target.value))}
+                                onChange={(e) => {
+                                    handleChange(e);
+                                    setSelectedDistrict(parseInt(e.target.value));
+                                }}
                                 disabled={!filteredDistricts.length}
                                 required
                             >
@@ -388,14 +394,15 @@ export default function Home() {
                                 ))}
                             </select>
                         </div>
-
-                        {/* Subdistrict Dropdown */}
                         <div className="flex items-center">
                             <label className="w-1/3 text-gray-700 font-semibold">Subdistrict :</label>
                             <select
                                 name="subdistrict"
                                 className="w-2/3 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                onChange={handleSubdistrictChange}
+                                onChange={(e) => {
+                                    handleChange(e);
+                                    handleSubdistrictChange(e);
+                                }}
                                 disabled={!filteredSubdistricts.length}
                                 required
                             >
@@ -407,8 +414,6 @@ export default function Home() {
                                 ))}
                             </select>
                         </div>
-
-                        {/* Zip Code */}
                         {selectedZipCode && (
                             <div className="flex items-center">
                                 <label className="w-1/3 text-gray-700 font-semibold">Zip Code :</label>
@@ -416,8 +421,6 @@ export default function Home() {
                             </div>
                         )}
                     </div>
-
-                    {/* Submit Button */}
                     <div className="text-right mt-6">
                         <button
                             type="submit"

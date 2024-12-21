@@ -19,7 +19,6 @@ export default function Dashboard() {
       }
     } catch (error) {
       setError("Error fetching data");
-      console.error("Error fetching data:", error);
     }
   };
 
